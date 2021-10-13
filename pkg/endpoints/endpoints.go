@@ -2,15 +2,19 @@ package endpoints
 
 import (
 	"context"
+	"log"
+	"reflect"
+
 	//"log"
 
 	"github.com/go-kit/kit/endpoint"
 
 	models "leonel/prototype_b/pkg/db/models"
 	services "leonel/prototype_b/pkg/services"
+	"leonel/prototype_b/pkg/utils"
 
+	"github.com/go-playground/validator/v10"
 )
-
 
 func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
@@ -30,7 +34,6 @@ func MakeGetQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 			return nil, err
 		}
 
-		//return question, nil
 		return GetQuestionResponse{ Question: question },nil
 	}
 }
@@ -40,7 +43,8 @@ func MakeCreateQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 
 		req := request.(CreateQuestionRequest)
 
-		err := srv.Validate(req.Question)
+		validator := validator.New()
+		err := validator.Struct(req.Question)
 
 		if err != nil{
 			return nil, err
@@ -74,6 +78,34 @@ func MakeUpdateQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateQuestionRequest)
 
+		validator := validator.New()
+
+		title_field, ok := reflect.TypeOf(models.Question{}).FieldByName("Title")
+
+		if !ok {
+			return nil, utils.ServerError
+		}
+
+		statement_field, ok := reflect.TypeOf(models.Question{}).FieldByName("Statement")
+
+		if !ok {
+			return nil, utils.ServerError
+		}
+
+		log.Println(title_field.Tag.Get("validate"))
+
+		err := validator.Var(req.Title, title_field.Tag.Get("validate"))
+		
+		if err != nil{
+			return nil, err
+		}
+
+		err = validator.Var(req.Statement, statement_field.Tag.Get("validate"))
+
+		if err != nil{
+			return nil, err
+		}
+
 		question, err := srv.UpdateQuestion(req.Question_id, req.Title, req.Statement)
 
 		if err != nil{
@@ -87,6 +119,13 @@ func MakeUpdateQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 func MakeUpdateAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateAnswerRequest)
+
+		validator := validator.New()
+		err := validator.Struct(req.Answer)
+
+		if err != nil{
+			return nil, err
+		}
 
 		answer, err := srv.UpdateAnswer(req.Question_id, &req.Answer)
 		
@@ -113,7 +152,7 @@ func MakeDeleteAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 //Requests
 
 type GetQuestionRequest struct{
-	Question_id string `validate:"required,max=10"`
+	Question_id string
 }
 
 type GetQuestionsRequest struct{}

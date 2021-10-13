@@ -8,7 +8,7 @@ import(
 
 type User struct {
 	ID null.String `json:"id"`
-	Username null.String `json:"username"`
+	Username null.String `json:"username" validate:"max=30"`
 }
 
 func UserQuestions(db *sql.DB, user_id string) ([]Question, error){

@@ -16,12 +16,6 @@ import (
 var migrate = flag.Bool("migrate",false,"Run migrations")
 var seed = flag.Bool("seed",false,"Seed the database")
 
-/*TODO
-implement logging middleware
-response codes
-go kit handlers middlewares
-*/
-
 func main(){
 
 	Db_conn := db.Db_connect()

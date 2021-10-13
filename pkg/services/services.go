@@ -6,7 +6,6 @@ import (
 	//"sync"
 
 	models "leonel/prototype_b/pkg/db/models"
-	"github.com/go-playground/validator/v10"
 )
 
 //service
@@ -24,27 +23,17 @@ type Service interface{
 	UpdateAnswer(string, *models.Answer) (*models.Answer, error)
 	
 	DeleteQuestion(string) error
-
-	Validate(str interface{}) error
 }
 
 type QuestionsAndAnswersService struct{
 	db *sql.DB
-	//questions map[string]*models.Question
-	validator *validator.Validate
 }
 
 //constructor
 func NewQuestionsAndAnswersService(db *sql.DB) *QuestionsAndAnswersService{
 	return &QuestionsAndAnswersService{
 		db: db,
-		validator: validator.New(),
 	}
-}
-
-func (srv *QuestionsAndAnswersService) Validate(str interface{}) error {
-
-	return srv.validator.Struct(str)
 }
 
 func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.Question, error){

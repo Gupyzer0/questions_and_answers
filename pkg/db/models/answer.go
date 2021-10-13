@@ -10,7 +10,7 @@ import (
 
 type Answer struct {
 	ID        null.String `json:"id"`
-	Statement null.String `json:"statement"`
+	Statement null.String `json:"statement" validate:"max=255"`
 	User      User   `json:"user"`
 }
 
