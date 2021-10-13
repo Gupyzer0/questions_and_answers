@@ -3,7 +3,6 @@ package transport
 import (
 	"context"
 	"encoding/json"
-	//"log"
 
 	"net/http"
 
@@ -15,6 +14,8 @@ import (
 	endpoints "leonel/prototype_b/pkg/endpoints"
 	services "leonel/prototype_b/pkg/services"
 	utils "leonel/prototype_b/pkg/utils"
+
+	"github.com/go-playground/validator/v10"
 )
 
 
@@ -23,7 +24,6 @@ func MakeHttpHandler(srv services.Service) *mux.Router{
 	router := mux.NewRouter()
 
 	options := []httptransport.ServerOption{
-		//httptransport.ServerErrorHandler()
 		httptransport.ServerErrorEncoder(encodeError),
 	}
 
@@ -178,16 +178,22 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	switch err{
-	case utils.ErrNotFound:
-		w.WriteHeader(utils.ErrNotFound.GetCode())
-	case utils.ErrBadData:
-		w.WriteHeader(utils.ErrBadData.GetCode())
-	case utils.ServerError:
-		w.WriteHeader(utils.ServerError.GetCode())
-	default:
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	_, ok := err.(validator.ValidationErrors)
+
+	if ok {
+		w.WriteHeader(http.StatusBadRequest)
+	} else {
+		switch err{
+		case utils.ErrNotFound:
+			w.WriteHeader(utils.ErrNotFound.GetCode())
+		case utils.ErrBadData:
+			w.WriteHeader(utils.ErrBadData.GetCode())
+		case utils.ServerError:
+			w.WriteHeader(utils.ServerError.GetCode())
+		default:
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+	}	
 
 	json.NewEncoder(w).Encode(err.Error())
 }

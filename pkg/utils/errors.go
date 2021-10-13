@@ -2,6 +2,11 @@ package utils
 
 import "net/http"
 
+type CustomErrorInt interface{
+	Error()
+	GetCode()
+}
+
 type CustomError struct {
 	message string
 	code    int

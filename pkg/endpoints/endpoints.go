@@ -8,11 +8,13 @@ import (
 
 	models "leonel/prototype_b/pkg/db/models"
 	services "leonel/prototype_b/pkg/services"
+
 )
+
 
 func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
-		//req := request.(getQuestionsRequest)
+		////req := request.(getQuestionsRequest) -> not used
 		questions := srv.GetQuestions()
 		return GetQuestionsResponse{Questions: questions}, nil
 	}
@@ -21,7 +23,7 @@ func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 func MakeGetQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 		req := request.(GetQuestionRequest)
-
+			
 		question, err := srv.GetQuestion(req.Question_id)
 
 		if err != nil{
@@ -37,12 +39,19 @@ func MakeCreateQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 
 		req := request.(CreateQuestionRequest)
+
+		err := srv.Validate(req.Question)
+
+		if err != nil{
+			return nil, err
+		}
+
 		question, err := srv.CreateQuestion(req.Question)
 		
 		if err != nil{
 			return nil, err
 		}
-
+		
 		return CreateQuestionResponse{Question: *question}, nil
 	}
 }
@@ -104,7 +113,7 @@ func MakeDeleteAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 //Requests
 
 type GetQuestionRequest struct{
-	Question_id string
+	Question_id string `validate:"required,max=10"`
 }
 
 type GetQuestionsRequest struct{}

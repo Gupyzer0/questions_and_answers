@@ -8,8 +8,8 @@ import (
 
 type Question struct {
 	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Statement string `json:"statement"`
+	Title     string `json:"title" validate:"required,max=100"`
+	Statement string `json:"statement" validate:"required,max=255"`
 
 	User   User   `json:"user"`
 	Answer Answer `json:"answer"`
