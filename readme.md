@@ -10,8 +10,9 @@
 
 #### flags
 
-**migrate:** Creates database tables
-**seed:** Inserts seed data for testing
+**migrate:** Creates database tables.
+
+**seed:** Inserts seed data for testing.
 
 #### TODO:
 logging
