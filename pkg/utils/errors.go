@@ -1,22 +1,31 @@
 package utils
 
-/*import(
-	"errors"
-)*/
+import "net/http"
 
 type CustomError struct {
 	message string
+	code    int
 }
 
 func (err CustomError) Error() string {
 	return err.message
 }
 
-var ErrNotFound = CustomError{message: "Resource Not Found"}
-var ErrBadData = CustomError{message: "Bad Request"}
-var ServerError = CustomError{message: "Server Error"}
+func (err CustomError) GetCode() int {
+	return err.code
+}
 
-/*var (
-	//ErrNotFound = errors.New("Not found")
-	ErrBadData = errors.New("Bad data")
-)*/
+var ErrNotFound = CustomError{
+	message: "Resource Not Found",
+	code: http.StatusNotFound,
+}
+
+var ErrBadData = CustomError{
+	message: "Bad Request",
+	code: http.StatusBadRequest,
+}
+var ServerError = CustomError{
+	message: "Server Error",
+	code: http.StatusInternalServerError,
+}
+

@@ -2,8 +2,8 @@ package models
 
 import (
 	"database/sql"
-	"log"
-	"leonel/prototype_b/pkg/utils"
+	//"log"
+	utils "leonel/prototype_b/pkg/utils"
 )
 
 type Question struct {
@@ -56,7 +56,6 @@ func IndexQuestions(db *sql.DB) ([]Question, error) {
 	}
 
 	return questions, nil
-
 }
 
 func CreateQuestion(db *sql.DB, question *Question) (*Question, error) {
@@ -96,8 +95,13 @@ func GetQuestion(db *sql.DB, question_id string) (*Question, error){
 		&question.Answer.ID, &question.Answer.Statement, &question.Answer.User.ID, &question.Answer.User.Username)
 
 	if err != nil{
-		log.Println("models error")
-		return nil, utils.ErrNotFound
+
+		switch err {
+		case sql.ErrNoRows:
+			return nil, utils.ErrNotFound
+		default:
+			return nil, err
+		}
 	}
 
 	return question, nil

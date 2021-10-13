@@ -3,7 +3,7 @@ package transport
 import (
 	"context"
 	"encoding/json"
-	"log"
+	//"log"
 
 	"net/http"
 
@@ -14,7 +14,7 @@ import (
 	models "leonel/prototype_b/pkg/db/models"
 	endpoints "leonel/prototype_b/pkg/endpoints"
 	services "leonel/prototype_b/pkg/services"
-	"leonel/prototype_b/pkg/utils"
+	utils "leonel/prototype_b/pkg/utils"
 )
 
 
@@ -88,7 +88,7 @@ func decodeCreateQuestionRequest(_ context.Context, r *http.Request) (interface{
 	var req endpoints.CreateQuestionRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+		return nil, utils.ErrBadData
 	}
 
 	return req, nil
@@ -102,8 +102,6 @@ func decodeGetQuestionRequest(_ context.Context, r *http.Request) (interface{}, 
 	if !ok {
 		return nil, utils.ErrBadData
 	}
-
-	log.Println("get question request")
 	
 	return endpoints.GetQuestionRequest{ Question_id: id, }, nil
 }
@@ -114,7 +112,7 @@ func decodeGetQuestionsByUserRequest(_ context.Context, r *http.Request) (interf
 	id, ok := vars["id"]
 
 	if !ok {
-		return nil, utils.ErrNotFound
+		return nil, utils.ErrBadData
 	}
 
 	return endpoints.GetQuestionsByUserRequest{ User_id: id,}, nil
@@ -125,13 +123,13 @@ func decodeUpdateQuestionRequest(_ context.Context, r *http.Request)(interface{}
 	id, ok := vars["id"]
 
 	if !ok {
-		return nil, utils.ErrNotFound
+		return nil, utils.ErrBadData
 	}
 
 	var req endpoints.UpdateQuestionRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return nil, err
+		return nil, utils.ErrBadData
 	}
 
 	return endpoints.UpdateQuestionRequest{ Question_id: id, Title: req.Title, Statement: req.Statement }, nil
@@ -141,14 +139,14 @@ func decodeUpdateAnswerRequest(_ context.Context, r *http.Request) (interface{},
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 
-	if !ok{
-		return nil, utils.ErrNotFound
+	if !ok {
+		return nil, utils.ErrBadData
 	}
 
 	var answer models.Answer
 
 	if err := json.NewDecoder(r.Body).Decode(&answer); err != nil {
-		return nil, err
+		return nil, utils.ErrBadData
 	}
 
 	return endpoints.UpdateAnswerRequest{ Question_id: id, Answer: answer }, nil
@@ -182,11 +180,11 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 
 	switch err{
 	case utils.ErrNotFound:
-		w.WriteHeader(http.StatusNotFound)
+		w.WriteHeader(utils.ErrNotFound.GetCode())
 	case utils.ErrBadData:
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(utils.ErrBadData.GetCode())
 	case utils.ServerError:
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(utils.ServerError.GetCode())
 	default:
 		w.WriteHeader(http.StatusInternalServerError)
 	}

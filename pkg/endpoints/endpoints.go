@@ -2,7 +2,7 @@ package endpoints
 
 import (
 	"context"
-	"log"
+	//"log"
 
 	"github.com/go-kit/kit/endpoint"
 
@@ -25,7 +25,6 @@ func MakeGetQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 		question, err := srv.GetQuestion(req.Question_id)
 
 		if err != nil{
-			log.Println("error make endpoint")
 			return nil, err
 		}
 

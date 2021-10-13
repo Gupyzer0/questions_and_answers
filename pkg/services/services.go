@@ -2,11 +2,11 @@ package services
 
 import (
 	"database/sql"
-	"log"
+	//"log"
 	//"sync"
 
 	models "leonel/prototype_b/pkg/db/models"
-	//utils "leonel/prototype_b/pkg/utils"
+	//transport "leonel/prototype_b/pkg/transport"
 )
 
 //service
@@ -43,7 +43,6 @@ func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.
 	question, err := models.GetQuestion(srv.db, question_id)
 
 	if err != nil{
-		log.Println("services error")
 		return nil, err
 	}
 
@@ -55,7 +54,6 @@ func (srv *QuestionsAndAnswersService) GetQuestions() ([]models.Question) {
 	questions, err := models.IndexQuestions(srv.db)
 
 	if err != nil{
-		log.Println(err)
 		return nil
 	}
 

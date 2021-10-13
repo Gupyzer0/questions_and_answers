@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"time"
@@ -8,7 +9,12 @@ import (
 	db "leonel/prototype_b/pkg/db"
 	services "leonel/prototype_b/pkg/services"
 	transport "leonel/prototype_b/pkg/transport"
+	migrations "leonel/prototype_b/pkg/db/migrations"
+	seeders "leonel/prototype_b/pkg/db/seeders"
 )
+
+var migrate = flag.Bool("migrate",false,"Run migrations")
+var seed = flag.Bool("seed",false,"Seed the database")
 
 /*TODO
 implement logging middleware
@@ -26,6 +32,18 @@ func main(){
 		panic(err)
 	} else {
 		log.Println("db connection success")
+	}
+
+	flag.Parse()
+
+	if *migrate == true{
+		log.Println("Migrating . . .")
+		migrations.DatabaseMigrate(Db_conn)
+	}
+
+	if *seed == true{
+		log.Println("Seeding . . .")
+		seeders.DatabaseSeed(Db_conn)
 	}
 	
 	srv := services.NewQuestionsAndAnswersService(Db_conn)
