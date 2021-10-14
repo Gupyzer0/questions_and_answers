@@ -15,11 +15,13 @@ type Question struct {
 	Answer Answer `json:"answer"`
 }
 
-func IndexQuestions(db *sql.DB) ([]Question, error) {
+type QuestionModel  struct{
+	DB *sql.DB
+}
 
-	questions := make([]Question, 0)
+func (m QuestionModel) Index() ([]Question, error) {
 
-	sql := `SELECT questions.id, questions.title, questions.statement, questions.user_id, users.username, 
+	query := `SELECT questions.id, questions.title, questions.statement, questions.user_id, users.username, 
 			answers.id AS answer_id, answers.statement AS answer_statement, ua.id AS answer_user_id , ua.username AS answer_user_username
 	
 			FROM questions 
@@ -28,13 +30,21 @@ func IndexQuestions(db *sql.DB) ([]Question, error) {
 				LEFT OUTER JOIN answers ON answer_id = answers.id
 				LEFT OUTER JOIN users ua ON ua.id = answers.user_id`
 
-	rows, err := db.Query(sql)
-
-	if err != nil {
-		panic(err)
-	}
+	rows, err := m.DB.Query(query)
 
 	defer rows.Close()
+
+	if err != nil{
+
+		switch err {
+		case sql.ErrNoRows:
+			return nil, utils.ErrNotFound
+		default:
+			return nil, err
+		}
+	}
+
+	var questions []Question
 
 	for rows.Next() {
 
@@ -58,36 +68,19 @@ func IndexQuestions(db *sql.DB) ([]Question, error) {
 	return questions, nil
 }
 
-func CreateQuestion(db *sql.DB, question *Question) (*Question, error) {
-
-	var new_id string
+func (m QuestionModel) Get(question_id string) (*Question, error) {
 	
-	err := db.QueryRow("INSERT INTO questions(user_id, title, statement) VALUES($1, $2, $3) RETURNING ID", question.User.ID, question.Title, question.Statement).Scan(&new_id)
+	query := `SELECT questions.id, questions.title, questions.statement, questions.user_id, users.username, 
+				answers.id AS answer_id, answers.statement AS answer_statement, ua.id AS answer_user_id , ua.username AS answer_user_username
+				
+				FROM questions 
+					LEFT OUTER JOIN users ON users.id = questions.user_id 
+					LEFT OUTER JOIN answers ON answer_id = answers.id
+					LEFT OUTER JOIN users ua ON ua.id = answers.user_id
 
-	if err != nil{
-		return nil, err
-	}
+				WHERE questions.id = $1`
 
-	question, err = GetQuestion(db, new_id)
-
-	if err != nil{
-		return nil, err
-	}
-
-	return question, nil
-}
-
-func GetQuestion(db *sql.DB, question_id string) (*Question, error){
-	
-	row := db.QueryRow(`SELECT questions.id, questions.title, questions.statement, questions.user_id, users.username, 
-		answers.id AS answer_id, answers.statement AS answer_statement, ua.id AS answer_user_id , ua.username AS answer_user_username
-		
-		FROM questions 
-			LEFT OUTER JOIN users ON users.id = questions.user_id 
-			LEFT OUTER JOIN answers ON answer_id = answers.id
-			LEFT OUTER JOIN users ua ON ua.id = answers.user_id
-
-		WHERE questions.id = $1`, question_id)
+	row := m.DB.QueryRow(query, question_id)
 
 	question := new(Question)
 
@@ -107,20 +100,39 @@ func GetQuestion(db *sql.DB, question_id string) (*Question, error){
 	return question, nil
 }
 
-func UpdateQuestion(db *sql.DB, question_id, question_title, question_statement string ) (*Question, error) {
+func (m QuestionModel) Create(question *Question) (*Question, error) {
 
-	_, err := db.Exec("UPDATE questions SET(title, statement) = ($2, $3) WHERE id = $1", question_id, question_title, question_statement)
+	var new_id string
+
+	err := m.DB.QueryRow("INSERT INTO questions(user_id, title, statement) VALUES($1, $2, $3) RETURNING ID", question.User.ID, question.Title, question.Statement).Scan(&new_id)
 
 	if err != nil{
 		return nil, err
 	}
 
-	return GetQuestion(db, question_id)
+	question, err = m.Get(new_id)
+
+	if err != nil{
+		return nil, err
+	}
+
+	return question, nil
 }
 
-func DeleteQuestion(db *sql.DB, question_id string) error {
+func (m QuestionModel) Update(question_id, question_title, question_statement string) (*Question, error) {
 
-	_, err := db.Exec("DELETE FROM questions WHERE id = $1", question_id)
+	_, err := m.DB.Exec("UPDATE questions SET(title, statement) = ($2, $3) WHERE id = $1", question_id, question_title, question_statement)
+
+	if err != nil{
+		return nil, err
+	}
+
+	return m.Get(question_id)
+}
+
+func (m QuestionModel) Delete(question_id string) error{
+	
+	_, err := m.DB.Exec("DELETE FROM questions WHERE id = $1", question_id)
 
 	if err != nil {
 		return err

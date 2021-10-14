@@ -24,5 +24,4 @@ func Db_connect() *sql.DB{
 	}
 
 	return db
-
 }

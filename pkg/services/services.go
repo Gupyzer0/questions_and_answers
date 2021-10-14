@@ -1,18 +1,15 @@
 package services
 
 import (
-	"database/sql"
-	//"log"
-	//"sync"
-
-	models "leonel/prototype_b/pkg/db/models"
+	"leonel/prototype_b/pkg/db/models"
+	//models "leonel/prototype_b/pkg/db/models"
 )
 
 //service
 type Service interface{
 	GetQuestion(string) (*models.Question,error)
 
-	GetQuestions() []models.Question
+	GetQuestions() ([]models.Question, error)
 	
 	GetQuestionsByUser(string) ([]models.Question, error)
 	
@@ -23,22 +20,24 @@ type Service interface{
 	UpdateAnswer(string, *models.Answer) (*models.Answer, error)
 	
 	DeleteQuestion(string) error
+
+	GetUsers() ([]models.User, error)
 }
 
 type QuestionsAndAnswersService struct{
-	db *sql.DB
+	mdl *models.Models_wrapper
 }
 
-//constructor
-func NewQuestionsAndAnswersService(db *sql.DB) *QuestionsAndAnswersService{
+//Questions and answer service constructor
+func NewQuestionsAndAnswersService(wrapper *models.Models_wrapper) *QuestionsAndAnswersService{
 	return &QuestionsAndAnswersService{
-		db: db,
+		mdl: wrapper,
 	}
 }
 
 func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.Question, error){
-
-	question, err := models.GetQuestion(srv.db, question_id)
+	
+	question, err := srv.mdl.Questions.Get(question_id)
 
 	if err != nil{
 		return nil, err
@@ -47,20 +46,20 @@ func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.
 	return question, nil
 }
 
-func (srv *QuestionsAndAnswersService) GetQuestions() ([]models.Question) {
+func (srv *QuestionsAndAnswersService) GetQuestions() ([]models.Question, error) {
 	
-	questions, err := models.IndexQuestions(srv.db)
+	questions, err := srv.mdl.Questions.Index()
 
 	if err != nil{
-		return nil
+		return nil, err
 	}
 
-	return questions
+	return questions, err
 }
 
 func (srv *QuestionsAndAnswersService) GetQuestionsByUser(user_id string) ([]models.Question, error){
 
-	questions, err := models.UserQuestions(srv.db, user_id)
+	questions, err := srv.mdl.Users.UserQuestions(user_id)
 
 	if err != nil{
 		return nil, err
@@ -71,7 +70,7 @@ func (srv *QuestionsAndAnswersService) GetQuestionsByUser(user_id string) ([]mod
 
 func (srv *QuestionsAndAnswersService) CreateQuestion(question *models.Question) (*models.Question, error){
 
-	question, err := models.CreateQuestion(srv.db, question) 
+	question, err := srv.mdl.Questions.Create(question)
 
 	if err != nil {
 		return nil, err
@@ -82,7 +81,7 @@ func (srv *QuestionsAndAnswersService) CreateQuestion(question *models.Question)
 
 func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id string, question_title string, question_statement string) (*models.Question, error){
 
-	updated_question, err := models.UpdateQuestion(srv.db, question_id, question_title, question_statement)
+	updated_question, err := srv.mdl.Questions.Update(question_id, question_title, question_statement)
 
 	if err != nil{
 		return nil, err
@@ -93,7 +92,7 @@ func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id string, questi
 
 func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id string, answer *models.Answer) (*models.Answer, error){
 
-	answer, err := models.UpdateAnswer(srv.db, question_id, answer)
+	answer, err := srv.mdl.Answers.Update(question_id, answer)
 
 	if err != nil{
 		return nil, err
@@ -104,11 +103,23 @@ func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id string, answer *
 
 func (srv *QuestionsAndAnswersService) DeleteQuestion(question_id string) error{
 
-	err := models.DeleteQuestion(srv.db, question_id)
+	err := srv.mdl.Questions.Delete(question_id)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (srv *QuestionsAndAnswersService) GetUsers() ([]models.User, error) {
+	
+	users, err := srv.mdl.Users.Index()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
+
 }

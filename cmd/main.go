@@ -7,11 +7,15 @@ import (
 	"time"
 
 	db "leonel/prototype_b/pkg/db"
+	//models "leonel/prototype_b/pkg/db/models"
+	migrations "leonel/prototype_b/pkg/db/migrations"
+	"leonel/prototype_b/pkg/db/models"
+	seeders "leonel/prototype_b/pkg/db/seeders"
 	services "leonel/prototype_b/pkg/services"
 	transport "leonel/prototype_b/pkg/transport"
-	migrations "leonel/prototype_b/pkg/db/migrations"
-	seeders "leonel/prototype_b/pkg/db/seeders"
 )
+
+
 
 var migrate = flag.Bool("migrate",false,"Run migrations")
 var seed = flag.Bool("seed",false,"Seed the database")
@@ -19,7 +23,6 @@ var seed = flag.Bool("seed",false,"Seed the database")
 func main(){
 
 	Db_conn := db.Db_connect()
-
 	err := Db_conn.Ping()
 
 	if err != nil{
@@ -40,7 +43,9 @@ func main(){
 		seeders.DatabaseSeed(Db_conn)
 	}
 	
-	srv := services.NewQuestionsAndAnswersService(Db_conn)
+	models_wrapper := models.InitializeModelsWrapper(Db_conn)
+
+	srv := services.NewQuestionsAndAnswersService(&models_wrapper)
 	
 	router := transport.MakeHttpHandler(srv)
 
@@ -52,5 +57,4 @@ func main(){
 	}
 
 	log.Fatal(server.ListenAndServe())
-
 }

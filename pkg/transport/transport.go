@@ -76,6 +76,13 @@ func MakeHttpHandler(srv services.Service) *mux.Router{
 		options...,
 	))
 
+	router.Methods("GET").Path("/users").Handler(httptransport.NewServer(
+		endpoints.MakeGetUsersEndpoint(srv),
+		decodeGetUsersRequest,
+		encodeResponse,
+		options...,
+	))
+
 	return router
 }
 
@@ -162,6 +169,10 @@ func decodeDeleteQuestionRequest(_ context.Context, r *http.Request) (interface{
 	}
 
 	return endpoints.DeleteQuestionRequest{ Question_id: id }, nil
+}
+
+func decodeGetUsersRequest(_ context.Context, r *http.Request) (interface{}, error) {
+	return endpoints.GetUsersRequest{}, nil
 }
 
 func encodeResponse(_ context.Context, w http.ResponseWriter, response interface{}) error{

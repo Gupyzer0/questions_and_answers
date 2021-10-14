@@ -14,14 +14,18 @@ type Answer struct {
 	User      User   `json:"user"`
 }
 
-func GetAnswer(db *sql.DB, answer_id string) (*Answer, error){
+type AnswerModel struct{
+	DB *sql.DB
+}
 
-	row := db.QueryRow(`SELECT answers.id, answers.statement, users.id, users.username 
-		FROM answers
+func (m AnswerModel) Get(answer_id string) (*Answer, error) {
 
-		INNER JOIN users ON answers.user_id = users.id
+	query := `SELECT answers.id, answers.statement, users.id, users.username 
+				FROM answers
+				INNER JOIN users ON answers.user_id = users.id
+				WHERE answers.id = $1`
 
-		WHERE answers.id = $1`, answer_id)
+	row := m.DB.QueryRow(query, answer_id)
 
 	answer := new(Answer)
 
@@ -38,14 +42,13 @@ func GetAnswer(db *sql.DB, answer_id string) (*Answer, error){
 	}
 
 	return answer, nil
-
 }
 
-func UpdateAnswer(db *sql.DB, question_id string, answer *Answer) (*Answer, error) {
+func (m AnswerModel) Update(question_id string, answer *Answer) (*Answer, error) {
 
 	var answ_id string
 
-	err := db.QueryRow("SELECT answer_id FROM questions WHERE id = $1",question_id).Scan(&answ_id)
+	err := m.DB.QueryRow("SELECT answer_id FROM questions WHERE id = $1",question_id).Scan(&answ_id)
 
 	if err != nil {
 		return nil, err
@@ -53,13 +56,13 @@ func UpdateAnswer(db *sql.DB, question_id string, answer *Answer) (*Answer, erro
 
 	var updated_answer *Answer
 
-	row := db.QueryRow("UPDATE answers SET(statement, user_id) = ($2, $3) WHERE id = $1", answ_id, answer.Statement, answer.User.ID)
+	row := m.DB.QueryRow("UPDATE answers SET(statement, user_id) = ($2, $3) WHERE id = $1", answ_id, answer.Statement, answer.User.ID)
 
 	if err= row.Err(); err != nil{
 		return nil, err
 	}
 
-	updated_answer, err = GetAnswer(db, answ_id);
+	updated_answer, err = m.Get(answ_id);
 
 	if err != nil {
 		return nil, err

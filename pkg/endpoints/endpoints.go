@@ -18,8 +18,13 @@ import (
 
 func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
-		////req := request.(getQuestionsRequest) -> not used
-		questions := srv.GetQuestions()
+
+		questions, err := srv.GetQuestions()
+
+		if err != nil{
+			return nil, err
+		}
+
 		return GetQuestionsResponse{Questions: questions}, nil
 	}
 }
@@ -149,6 +154,19 @@ func MakeDeleteAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
+func MakeGetUsersEndpoint( srv services.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+
+		users, err := srv.GetUsers()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return GetUsersReponse{ Users: users }, nil
+	}
+}
+
 //Requests
 
 type GetQuestionRequest struct{
@@ -179,6 +197,8 @@ type UpdateAnswerRequest struct{
 type DeleteQuestionRequest struct{
 	Question_id string
 }
+
+type GetUsersRequest struct {}
 
 //Responses
 type GetQuestionResponse struct{
@@ -211,4 +231,8 @@ type UpdateAnswerResponse struct{
 
 type DeleteQuestionResponse struct{
 	Error error `json:"error,omitempty"`
+}
+
+type GetUsersReponse struct {
+	Users []models.User `json:"users"`
 }
