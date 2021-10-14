@@ -171,7 +171,7 @@ type CreateQuestionRequest struct{
 type UpdateQuestionRequest struct{
 	Question_id string `validate:"required,max=10"`
 	Title string `validate:"required,max=100"`
-	Statement string `validate:"required,255"`
+	Statement string `validate:"required,max=255"`
 }
 
 type UpdateAnswerRequest struct{

@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	//"log"
+	//"log"
 	utils "leonel/prototype_b/pkg/utils"
 )
 
@@ -100,7 +101,7 @@ func (m QuestionModel) Get(question_id string) (*Question, error) {
 	return question, nil
 }
 
-func (m QuestionModel) Create(title,statement,user_id string) (*Question, error) {
+func (m QuestionModel) Create(user_id,title,statement string) (*Question, error) {
 
 	var new_id string
 
