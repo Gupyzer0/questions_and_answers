@@ -10,14 +10,14 @@ type Models_wrapper struct {
 	Questions interface {
 		Index() ([]Question, error)
 		Get(question_id string) (*Question, error)
-		Create(question *Question) (*Question, error)
+		Create(title,statement,user_id string) (*Question, error)
 		Update(question_id, question_title, question_statement string) (*Question, error)
 		Delete(question_id string) error
 	}
 
 	Answers interface {
 		Get(answer_id string) (*Answer, error)
-		Update(question_id string, answer *Answer) (*Answer, error)
+		Update(question_id,statement,user_id string,) (*Answer, error)
 	}
 
 	Users interface {

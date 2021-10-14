@@ -100,17 +100,17 @@ func (m QuestionModel) Get(question_id string) (*Question, error) {
 	return question, nil
 }
 
-func (m QuestionModel) Create(question *Question) (*Question, error) {
+func (m QuestionModel) Create(title,statement,user_id string) (*Question, error) {
 
 	var new_id string
 
-	err := m.DB.QueryRow("INSERT INTO questions(user_id, title, statement) VALUES($1, $2, $3) RETURNING ID", question.User.ID, question.Title, question.Statement).Scan(&new_id)
+	err := m.DB.QueryRow("INSERT INTO questions(user_id, title, statement) VALUES($1, $2, $3) RETURNING ID", user_id, title, statement).Scan(&new_id)
 
 	if err != nil{
 		return nil, err
 	}
 
-	question, err = m.Get(new_id)
+	question, err := m.Get(new_id)
 
 	if err != nil{
 		return nil, err

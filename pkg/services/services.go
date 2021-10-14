@@ -3,36 +3,39 @@ package services
 import (
 	"leonel/prototype_b/pkg/db/models"
 	//models "leonel/prototype_b/pkg/db/models"
+	"github.com/go-playground/validator/v10"
+
 )
 
 //service
 type Service interface{
 	GetQuestion(string) (*models.Question,error)
-
-	GetQuestions() ([]models.Question, error)
-	
-	GetQuestionsByUser(string) ([]models.Question, error)
-	
-	CreateQuestion(*models.Question) (*models.Question, error)
-	
-	UpdateQuestion(string,string,string) (*models.Question, error)
-	
-	UpdateAnswer(string, *models.Answer) (*models.Answer, error)
-	
+	GetQuestions() ([]models.Question, error)	
+	GetQuestionsByUser(string) ([]models.Question, error)	
+	CreateQuestion(string,string,string) (*models.Question, error)	
+	UpdateQuestion(string,string,string) (*models.Question, error)	
+	UpdateAnswer(string,string,string) (*models.Answer, error)
 	DeleteQuestion(string) error
-
 	GetUsers() ([]models.User, error)
+
+	Validate(interface{}) error
 }
 
 type QuestionsAndAnswersService struct{
 	mdl *models.Models_wrapper
+	validator *validator.Validate
 }
 
 //Questions and answer service constructor
 func NewQuestionsAndAnswersService(wrapper *models.Models_wrapper) *QuestionsAndAnswersService{
 	return &QuestionsAndAnswersService{
 		mdl: wrapper,
+		validator: validator.New(),
 	}
+}
+
+func (srv *QuestionsAndAnswersService) Validate(req interface{}) error {
+	return srv.validator.Struct(req)
 }
 
 func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.Question, error){
@@ -68,9 +71,9 @@ func (srv *QuestionsAndAnswersService) GetQuestionsByUser(user_id string) ([]mod
 	return questions, nil
 }
 
-func (srv *QuestionsAndAnswersService) CreateQuestion(question *models.Question) (*models.Question, error){
+func (srv *QuestionsAndAnswersService) CreateQuestion(title,statement,user_id string) (*models.Question, error){
 
-	question, err := srv.mdl.Questions.Create(question)
+	question, err := srv.mdl.Questions.Create(title,statement,user_id)
 
 	if err != nil {
 		return nil, err
@@ -79,7 +82,7 @@ func (srv *QuestionsAndAnswersService) CreateQuestion(question *models.Question)
 	return question, nil
 }
 
-func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id string, question_title string, question_statement string) (*models.Question, error){
+func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id, question_title, question_statement string) (*models.Question, error){
 
 	updated_question, err := srv.mdl.Questions.Update(question_id, question_title, question_statement)
 
@@ -90,9 +93,9 @@ func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id string, questi
 	return updated_question, nil
 }
 
-func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id string, answer *models.Answer) (*models.Answer, error){
+func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id, statement, user_id string) (*models.Answer, error){
 
-	answer, err := srv.mdl.Answers.Update(question_id, answer)
+	answer, err := srv.mdl.Answers.Update(question_id, statement, user_id)
 
 	if err != nil{
 		return nil, err

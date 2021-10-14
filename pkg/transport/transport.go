@@ -10,7 +10,7 @@ import (
 
 	httptransport "github.com/go-kit/kit/transport/http"
 
-	models "leonel/prototype_b/pkg/db/models"
+	//models "leonel/prototype_b/pkg/db/models"
 	endpoints "leonel/prototype_b/pkg/endpoints"
 	services "leonel/prototype_b/pkg/services"
 	utils "leonel/prototype_b/pkg/utils"
@@ -150,13 +150,13 @@ func decodeUpdateAnswerRequest(_ context.Context, r *http.Request) (interface{},
 		return nil, utils.ErrBadData
 	}
 
-	var answer models.Answer
+	var req endpoints.UpdateAnswerRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&answer); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, utils.ErrBadData
 	}
 
-	return endpoints.UpdateAnswerRequest{ Question_id: id, Answer: answer }, nil
+	return endpoints.UpdateAnswerRequest{ Question_id: id, Statement: req.Statement, User_id: req.User_id }, nil
 }
 
 func decodeDeleteQuestionRequest(_ context.Context, r *http.Request) (interface{}, error) {
