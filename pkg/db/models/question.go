@@ -2,8 +2,6 @@ package models
 
 import (
 	"database/sql"
-	//"log"
-	//"log"
 	utils "leonel/prototype_b/pkg/utils"
 )
 

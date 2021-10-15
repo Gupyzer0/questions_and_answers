@@ -33,4 +33,3 @@ var ServerError = CustomError{
 	message: "Server Error",
 	code: http.StatusInternalServerError,
 }
-

@@ -2,17 +2,10 @@ package endpoints
 
 import (
 	"context"
-	//"reflect"
-
-	//"log"
-
 	"github.com/go-kit/kit/endpoint"
 
 	models "leonel/prototype_b/pkg/db/models"
 	services "leonel/prototype_b/pkg/services"
-	//"leonel/prototype_b/pkg/utils"
-
-	//"github.com/go-playground/validator/v10"
 )
 
 func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {

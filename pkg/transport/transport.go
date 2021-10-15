@@ -10,14 +10,10 @@ import (
 
 	httptransport "github.com/go-kit/kit/transport/http"
 
-	//models "leonel/prototype_b/pkg/db/models"
 	endpoints "leonel/prototype_b/pkg/endpoints"
 	services "leonel/prototype_b/pkg/services"
 	utils "leonel/prototype_b/pkg/utils"
-
-	"github.com/go-playground/validator/v10"
 )
-
 
 func MakeHttpHandler(srv services.Service) *mux.Router{
 
@@ -183,16 +179,29 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
+	
 	if err == nil{
 		panic("Error: nil error")
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-	_, ok := err.(validator.ValidationErrors)
+	validationError, ok := err.(*utils.CustomValidationErrors)
 
 	if ok {
 		w.WriteHeader(http.StatusBadRequest)
+		//errorsSlice := validationError.GetErrors()
+
+		errorStruct :=  struct {
+			Errors []string
+		}{
+			Errors: validationError.GetErrors(),
+		}
+
+		json.NewEncoder(w).Encode(errorStruct)
+	
+		return
+
 	} else {
 		switch err{
 		case utils.ErrNotFound:
@@ -203,6 +212,7 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 			w.WriteHeader(utils.ServerError.GetCode())
 		default:
 			w.WriteHeader(http.StatusInternalServerError)
+			return
 		}
 	}	
 

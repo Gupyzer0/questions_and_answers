@@ -15,8 +15,6 @@ import (
 	transport "leonel/prototype_b/pkg/transport"
 )
 
-
-
 var migrate = flag.Bool("migrate",false,"Run migrations")
 var seed = flag.Bool("seed",false,"Seed the database")
 
