@@ -56,7 +56,7 @@ func translateError(err error, trans ut.Translator) (errs *utils.CustomValidatio
 	var cstm_val_errors utils.CustomValidationErrors
 
 	if err == nil {
-		return &cstm_val_errors
+		return nil
 	}
 
 	validator_errors := err.(validator.ValidationErrors)
@@ -71,6 +71,11 @@ func translateError(err error, trans ut.Translator) (errs *utils.CustomValidatio
 
 func (srv *QuestionsAndAnswersService) Validate(req interface{}) error {
 	err := srv.validator.Struct(req)
+
+	if err == nil{
+		return nil
+	}
+
 	return translateError(err, *srv.Validator_err_translatator)
 }
 

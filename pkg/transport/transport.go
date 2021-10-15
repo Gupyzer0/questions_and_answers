@@ -189,8 +189,8 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 	validationError, ok := err.(*utils.CustomValidationErrors)
 
 	if ok {
+
 		w.WriteHeader(http.StatusBadRequest)
-		//errorsSlice := validationError.GetErrors()
 
 		errorStruct :=  struct {
 			Errors []string

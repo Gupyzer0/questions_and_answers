@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"context"
+
 	"github.com/go-kit/kit/endpoint"
 
 	models "leonel/prototype_b/pkg/db/models"
