@@ -11,9 +11,10 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
+//mock models for testing services
 
 //service
-type Service interface{
+type QuestionsAndAnswers interface{
 	GetQuestion(string) (*models.Question,error)
 	GetQuestions() ([]models.Question, error)	
 	GetQuestionsByUser(string) ([]models.Question, error)	
@@ -26,14 +27,14 @@ type Service interface{
 	Validate(interface{}) error
 }
 
-type QuestionsAndAnswersService struct{
+type qaService struct{
 	mdl *models.Models_wrapper
 	validator *validator.Validate
 	Validator_err_translatator *ut.Translator
 }
 
 //Questions and answer service constructor
-func NewQuestionsAndAnswersService(wrapper *models.Models_wrapper) *QuestionsAndAnswersService{
+func NewQuestionsAndAnswersService(wrapper *models.Models_wrapper) QuestionsAndAnswers{
 	
 	validator := validator.New()
 
@@ -42,7 +43,7 @@ func NewQuestionsAndAnswersService(wrapper *models.Models_wrapper) *QuestionsAnd
 	trans, _ := uni.GetTranslator("en")
 	_ = en_translations.RegisterDefaultTranslations(validator, trans)
 
-	service := QuestionsAndAnswersService{
+	service := qaService{
 		mdl: wrapper,
 		validator: validator,
 		Validator_err_translatator: &trans,
@@ -69,7 +70,7 @@ func translateError(err error, trans ut.Translator) (errs *utils.CustomValidatio
 	return &cstm_val_errors
 }
 
-func (srv *QuestionsAndAnswersService) Validate(req interface{}) error {
+func (srv *qaService) Validate(req interface{}) error {
 	err := srv.validator.Struct(req)
 
 	if err == nil{
@@ -79,7 +80,7 @@ func (srv *QuestionsAndAnswersService) Validate(req interface{}) error {
 	return translateError(err, *srv.Validator_err_translatator)
 }
 
-func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.Question, error){
+func (srv *qaService) GetQuestion(question_id string) (*models.Question, error){
 	
 	question, err := srv.mdl.Questions.Get(question_id)
 
@@ -90,7 +91,7 @@ func (srv *QuestionsAndAnswersService) GetQuestion(question_id string) (*models.
 	return question, nil
 }
 
-func (srv *QuestionsAndAnswersService) GetQuestions() ([]models.Question, error) {
+func (srv *qaService) GetQuestions() ([]models.Question, error) {
 	
 	questions, err := srv.mdl.Questions.Index()
 
@@ -101,7 +102,7 @@ func (srv *QuestionsAndAnswersService) GetQuestions() ([]models.Question, error)
 	return questions, err
 }
 
-func (srv *QuestionsAndAnswersService) GetQuestionsByUser(user_id string) ([]models.Question, error){
+func (srv *qaService) GetQuestionsByUser(user_id string) ([]models.Question, error){
 
 	questions, err := srv.mdl.Users.UserQuestions(user_id)
 
@@ -112,7 +113,7 @@ func (srv *QuestionsAndAnswersService) GetQuestionsByUser(user_id string) ([]mod
 	return questions, nil
 }
 
-func (srv *QuestionsAndAnswersService) CreateQuestion(title,statement,user_id string) (*models.Question, error){
+func (srv *qaService) CreateQuestion(title,statement,user_id string) (*models.Question, error){
 
 	question, err := srv.mdl.Questions.Create(title,statement,user_id)
 
@@ -123,7 +124,7 @@ func (srv *QuestionsAndAnswersService) CreateQuestion(title,statement,user_id st
 	return question, nil
 }
 
-func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id, question_title, question_statement string) (*models.Question, error){
+func (srv *qaService) UpdateQuestion(question_id, question_title, question_statement string) (*models.Question, error){
 
 	updated_question, err := srv.mdl.Questions.Update(question_id, question_title, question_statement)
 
@@ -134,7 +135,7 @@ func (srv *QuestionsAndAnswersService) UpdateQuestion(question_id, question_titl
 	return updated_question, nil
 }
 
-func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id, statement, user_id string) (*models.Answer, error){
+func (srv *qaService) UpdateAnswer(question_id, statement, user_id string) (*models.Answer, error){
 
 	answer, err := srv.mdl.Answers.Update(question_id, statement, user_id)
 
@@ -145,7 +146,7 @@ func (srv *QuestionsAndAnswersService) UpdateAnswer(question_id, statement, user
 	return answer, nil	
 }
 
-func (srv *QuestionsAndAnswersService) DeleteQuestion(question_id string) error{
+func (srv *qaService) DeleteQuestion(question_id string) error{
 
 	err := srv.mdl.Questions.Delete(question_id)
 
@@ -156,7 +157,7 @@ func (srv *QuestionsAndAnswersService) DeleteQuestion(question_id string) error{
 	return nil
 }
 
-func (srv *QuestionsAndAnswersService) GetUsers() ([]models.User, error) {
+func (srv *qaService) GetUsers() ([]models.User, error) {
 	
 	users, err := srv.mdl.Users.Index()
 

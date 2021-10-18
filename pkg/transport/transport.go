@@ -15,7 +15,9 @@ import (
 	utils "leonel/prototype_b/pkg/utils"
 )
 
-func MakeHttpHandler(srv services.Service) *mux.Router{
+//test definir new create question  request, crear contrusctor para cada uno
+
+func MakeHttpHandler(srv services.QuestionsAndAnswers) *mux.Router{
 
 	router := mux.NewRouter()
 
@@ -66,7 +68,7 @@ func MakeHttpHandler(srv services.Service) *mux.Router{
 	))
 
 	router.Methods("DELETE").Path("/question/{id}").Handler(httptransport.NewServer(
-		endpoints.MakeDeleteAnswerEndpoint(srv),
+		endpoints.MakeDeleteQuestionEndpoint(srv),
 		decodeDeleteQuestionRequest,
 		encodeResponse,
 		options...,
@@ -102,7 +104,7 @@ func decodeGetQuestionRequest(_ context.Context, r *http.Request) (interface{}, 
 
 	id, ok := vars["id"]
 
-	if !ok {
+	if !ok || id == "" {
 		return nil, utils.ErrBadData
 	}
 	
@@ -125,7 +127,7 @@ func decodeUpdateQuestionRequest(_ context.Context, r *http.Request)(interface{}
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 
-	if !ok {
+	if !ok || id == "" {
 		return nil, utils.ErrBadData
 	}
 
@@ -135,14 +137,14 @@ func decodeUpdateQuestionRequest(_ context.Context, r *http.Request)(interface{}
 		return nil, utils.ErrBadData
 	}
 
-	return endpoints.UpdateQuestionRequest{ Question_id: id, Title: req.Title, Statement: req.Statement }, nil
+	return endpoints.UpdateQuestionRequest{ Question_id:id, Title:req.Title, Statement:req.Statement }, nil
 }
 
 func decodeUpdateAnswerRequest(_ context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	id, ok := vars["id"]
 
-	if !ok {
+	if !ok || id == "" {
 		return nil, utils.ErrBadData
 	}
 

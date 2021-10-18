@@ -4,26 +4,28 @@ import(
 	"database/sql"
 )
 
+type QuestionsInterface interface {
+	Index() ([]Question, error)
+	Get(question_id string) (*Question, error)
+	Create(title,statement,user_id string) (*Question, error)
+	Update(question_id, question_title, question_statement string) (*Question, error)
+	Delete(question_id string) error
+}
+
+type AnswersInterface interface {
+	Get(answer_id string) (*Answer, error)
+	Update(question_id,statement,user_id string,) (*Answer, error)
+}
+
+type UsersInterface interface {
+	Index() ([]User, error)
+	UserQuestions(user_id string) ([]Question, error)
+}
 
 type Models_wrapper struct {
-
-	Questions interface {
-		Index() ([]Question, error)
-		Get(question_id string) (*Question, error)
-		Create(title,statement,user_id string) (*Question, error)
-		Update(question_id, question_title, question_statement string) (*Question, error)
-		Delete(question_id string) error
-	}
-
-	Answers interface {
-		Get(answer_id string) (*Answer, error)
-		Update(question_id,statement,user_id string,) (*Answer, error)
-	}
-
-	Users interface {
-		Index() ([]User, error)
-		UserQuestions(user_id string) ([]Question, error)
-	}
+	Questions QuestionsInterface
+	Answers AnswersInterface
+	Users UsersInterface
 }
 
 func InitializeModelsWrapper(db *sql.DB) Models_wrapper {

@@ -9,7 +9,9 @@ import (
 	services "leonel/prototype_b/pkg/services"
 )
 
-func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
+//todo test what is inside, create endpoint and pass the data, use encode and decode
+
+func MakeGetQuestionsEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 
 		questions, err := srv.GetQuestions()
@@ -22,7 +24,7 @@ func MakeGetQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeGetQuestionEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeGetQuestionEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 		req := request.(GetQuestionRequest)
 			
@@ -36,7 +38,7 @@ func MakeGetQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeCreateQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeCreateQuestionsEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 
 		req := request.(CreateQuestionRequest)
@@ -57,7 +59,7 @@ func MakeCreateQuestionsEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeGetQuestionsByUserEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeGetQuestionsByUserEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error){
 
 		req := request.(GetQuestionsByUserRequest)
@@ -78,7 +80,7 @@ func MakeGetQuestionsByUserEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeUpdateQuestionEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeUpdateQuestionEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateQuestionRequest)
 
@@ -98,7 +100,7 @@ func MakeUpdateQuestionEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeUpdateAnswerEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeUpdateAnswerEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(UpdateAnswerRequest)
 
@@ -119,7 +121,7 @@ func MakeUpdateAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeDeleteAnswerEndpoint(srv services.Service) endpoint.Endpoint {
+func MakeDeleteQuestionEndpoint(srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(DeleteQuestionRequest)
 
@@ -130,7 +132,7 @@ func MakeDeleteAnswerEndpoint(srv services.Service) endpoint.Endpoint {
 	}
 }
 
-func MakeGetUsersEndpoint( srv services.Service) endpoint.Endpoint {
+func MakeGetUsersEndpoint( srv services.QuestionsAndAnswers) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 
 		users, err := srv.GetUsers()
