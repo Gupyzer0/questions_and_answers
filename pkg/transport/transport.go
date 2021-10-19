@@ -116,7 +116,7 @@ func decodeGetQuestionsByUserRequest(_ context.Context, r *http.Request) (interf
 
 	id, ok := vars["id"]
 
-	if !ok {
+	if !ok  || id == "" {
 		return nil, utils.ErrBadData
 	}
 
@@ -162,7 +162,7 @@ func decodeDeleteQuestionRequest(_ context.Context, r *http.Request) (interface{
 
 	id, ok := vars["id"]
 
-	if !ok {
+	if !ok || id == "" {
 		return nil, utils.ErrBadData
 	}
 

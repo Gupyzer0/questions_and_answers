@@ -25,9 +25,9 @@ func (err *CustomValidationErrors) AddError(e error) {
 }
 
 func (err *CustomValidationErrors) GetErrors() []string {
-	string_errors := make([]string,0)
-	
-	for _,e := range err.Errors {
+	string_errors := make([]string, 0)
+
+	for _, e := range err.Errors {
 		string_errors = append(string_errors, e.Error())
 	}
 
