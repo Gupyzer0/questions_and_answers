@@ -56,10 +56,6 @@ func translateError(err error, trans ut.Translator) (errs *utils.CustomValidatio
 
 	var cstm_val_errors utils.CustomValidationErrors
 
-	if err == nil {
-		return nil
-	}
-
 	validator_errors := err.(validator.ValidationErrors)
 	
 	for _, e := range validator_errors {

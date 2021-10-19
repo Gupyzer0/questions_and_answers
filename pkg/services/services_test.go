@@ -1,15 +1,17 @@
 package services
 
 import (
-	mock_models "leonel/prototype_b/mocks/mock_db"
-	"leonel/prototype_b/pkg/db/models"
+	"errors"
+	//"log"
 	"testing"
 
-	"github.com/golang/mock/gomock"
-	uuid "github.com/satori/go.uuid"
-	"github.com/stretchr/testify/assert"
+	mock_models "leonel/prototype_b/mocks/mock_db"
+	"leonel/prototype_b/pkg/db/models"
+	"leonel/prototype_b/pkg/utils"
 
-	//"golang.org/x/text/search"
+	uuid "github.com/satori/go.uuid"
+	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -386,5 +388,48 @@ func TestGetUsers(t *testing.T) {
 			assert.Equal(t,test.ExpectedErrorResponse, err)
 		})
 	}
+}
 
+func TestValidate(t *testing.T) {
+
+	config := setupTest(t)
+
+	type TestRequest struct{
+		Question_id string `validate:"required,max=10"`
+	}
+
+	type test struct {
+		Value TestRequest
+		Expected error
+	}
+
+	tests := []test{
+		{
+			Value: TestRequest{
+				Question_id: "123456789123456789",
+			},
+			Expected: &utils.CustomValidationErrors{
+				Errors: []error{
+					errors.New("Question_id must be a maximum of 10 characters in length"),
+				},
+			},
+		},
+		{
+			Value: TestRequest{
+				Question_id: "5555666487",
+			},
+			Expected: nil,
+		},
+	}
+
+
+	for _, test := range tests {
+		
+		t.Run("Testing service's Validate method", func(t *testing.T){
+
+			err := config.service.Validate(test.Value)
+			//log.Println(err)
+			assert.Equal(t,err, test.Expected)
+		})
+	}
 }
