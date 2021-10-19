@@ -181,10 +181,6 @@ func encodeResponse(_ context.Context, w http.ResponseWriter, response interface
 }
 
 func encodeError(_ context.Context, err error, w http.ResponseWriter) {
-	
-	if err == nil{
-		panic("Error: nil error")
-	}
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 

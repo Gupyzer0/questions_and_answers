@@ -54,5 +54,7 @@ func main(){
 		ReadTimeout: 10 * time.Second,
 	}
 
+	log.Println("Server started . . .")
+
 	log.Fatal(server.ListenAndServe())
 }

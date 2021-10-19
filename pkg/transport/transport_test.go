@@ -446,9 +446,6 @@ func TestEncodeError(t *testing.T) {
 			if test.ExpectedStatusCode != w.Code {
 				t.Errorf("Wrong response code, wanted %v but got %v", test.ExpectedStatusCode, w.Code)
 			}
-
-			fmt.Println("------>",w.Body.String())
-
 		})
 	}
 }
