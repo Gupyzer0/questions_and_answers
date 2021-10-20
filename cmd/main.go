@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	db "leonel/prototype_b/pkg/db"
@@ -13,6 +14,8 @@ import (
 	seeders "leonel/prototype_b/pkg/db/seeders"
 	services "leonel/prototype_b/pkg/services"
 	transport "leonel/prototype_b/pkg/transport"
+
+	gokit_log "github.com/go-kit/kit/log"
 )
 
 var migrate = flag.Bool("migrate",false,"Run migrations")
@@ -43,9 +46,15 @@ func main(){
 	
 	models_wrapper := models.InitializeModelsWrapper(Db_conn)
 
+
+	logger := gokit_log.NewLogfmtLogger(os.Stderr)	
+
 	srv := services.NewQuestionsAndAnswersService(&models_wrapper)
+
+	//inserting logging middleware
+	serv_with_log := services.LoggingMiddleware{Logger: logger, Next: srv}
 	
-	router := transport.MakeHttpHandler(srv)
+	router := transport.MakeHttpHandler(serv_with_log)
 
 	server := &http.Server{
 		Handler: router,
