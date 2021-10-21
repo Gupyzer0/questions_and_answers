@@ -16,6 +16,7 @@ import (
 	transport "leonel/prototype_b/pkg/transport"
 
 	gokit_log "github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 var migrate = flag.Bool("migrate",false,"Run migrations")
@@ -46,8 +47,8 @@ func main(){
 	
 	models_wrapper := models.InitializeModelsWrapper(Db_conn)
 
-
-	logger := gokit_log.NewLogfmtLogger(os.Stderr)	
+	logger := gokit_log.NewLogfmtLogger(os.Stderr)
+	logger = level.NewFilter(logger, level.AllowAll())
 
 	srv := services.NewQuestionsAndAnswersService(&models_wrapper)
 
@@ -64,6 +65,5 @@ func main(){
 	}
 
 	log.Println("Server started . . .")
-
 	log.Fatal(server.ListenAndServe())
 }

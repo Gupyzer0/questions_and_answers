@@ -2,7 +2,7 @@ package services
 
 import (
 	"errors"
-	//"log"
+	"os"
 	"testing"
 
 	mock_models "leonel/prototype_b/mocks/mock_db"
@@ -13,6 +13,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/guregu/null.v4"
+
+	gokit_log "github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 type testConfig struct {
@@ -34,6 +37,12 @@ func setupTest(t *testing.T) *testConfig {
 
 	suite.service = NewQuestionsAndAnswersService(&suite.mockModels)
 
+	//testing now with logging
+	logger := gokit_log.NewLogfmtLogger(os.Stderr)
+	logger = level.NewFilter(logger, level.AllowAll())
+
+	suite.service = LoggingMiddleware{Logger: logger, Next: suite.service}
+
 	return &suite
 }
 
@@ -52,23 +61,44 @@ func (s *testConfig) GetUsersModel() *mock_models.MockUsersInterfaceMockRecorder
 func TestGetQuestions(t *testing.T) {
 	config := setupTest(t)
 
-	expected := []models.Question{
+	type test struct {
+		Expected []models.Question
+		ExpectedError interface{}
+	}
+
+	tests := []test{
 		{
-			ID: uuid.NewV4().String(),
-			Title:     "Is this a question",
-			Statement: "The real question is the answer?",
-			User: models.User{
-				ID:       null.NewString(uuid.NewV4().String(), true),
-				Username: null.NewString("user1", true),
+			Expected: []models.Question{
+				{
+					ID: uuid.NewV4().String(),
+					Title:     "Is this a question",
+					Statement: "The real question is the answer?",
+					User: models.User{
+						ID:       null.NewString(uuid.NewV4().String(), true),
+						Username: null.NewString("user1", true),
+					},
+				},
 			},
+			ExpectedError: nil,			
+		},
+		{	
+			Expected: nil,
+			ExpectedError: assert.AnError,
 		},
 	}
 
-	config.GetQuestionModel().Index().Return(expected, nil)
+	for _, test := range tests {
 
-	got, err := config.service.GetQuestions()
-	assert.NoError(t, err)
-	assert.Equal(t, expected, got)
+		t.Run("Testing GetQuestion service", func(t *testing.T){
+
+			config.GetQuestionModel().Index().Return(test.Expected, test.ExpectedError)
+			questions, err := config.service.GetQuestions()
+			
+			assert.Equal(t, test.Expected, questions, "Response not equal")
+			assert.Equal(t, test.ExpectedError, err, "Error not equal")
+		})
+
+	}	
 }
 
 func TestGetQuestion(t *testing.T) {

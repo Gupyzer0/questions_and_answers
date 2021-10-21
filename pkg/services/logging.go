@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/log/level"
 )
 
 type LoggingMiddleware struct {
@@ -17,7 +18,7 @@ type LoggingMiddleware struct {
 func (mw LoggingMiddleware) GetQuestions() (output []models.Question, err error) {
 
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "GetQuestions",
 			"input", nil,
 			"output", fmt.Sprintln(output),
@@ -33,7 +34,7 @@ func (mw LoggingMiddleware) GetQuestions() (output []models.Question, err error)
 
 func (mw LoggingMiddleware) GetQuestion(question_id string) (output *models.Question, err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "GetQuestion",
 			"input", question_id,
 			"output", fmt.Sprintln(output),
@@ -49,7 +50,7 @@ func (mw LoggingMiddleware) GetQuestion(question_id string) (output *models.Ques
 
 func (mw LoggingMiddleware) CreateQuestion(title,statement,user_id string) (output *models.Question, err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "CreateQuestion",
 			"input", fmt.Sprintln(title,statement,user_id),
 			"output", fmt.Sprintln(output),
@@ -65,7 +66,7 @@ func (mw LoggingMiddleware) CreateQuestion(title,statement,user_id string) (outp
 
 func (mw LoggingMiddleware) GetQuestionsByUser(user_id string) (output []models.Question, err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "GetQuestionsByUser",
 			"input", user_id,
 			"output", fmt.Sprintln(output),
@@ -81,7 +82,7 @@ func (mw LoggingMiddleware) GetQuestionsByUser(user_id string) (output []models.
 
 func (mw LoggingMiddleware) UpdateQuestion(question_id, question_title, question_statement string) (output *models.Question, err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "UpdateQuestion",
 			"input", fmt.Sprintln(question_id, question_title, question_statement),
 			"output", fmt.Sprintln(output),
@@ -97,7 +98,7 @@ func (mw LoggingMiddleware) UpdateQuestion(question_id, question_title, question
 
 func (mw LoggingMiddleware) DeleteQuestion(question_id string) (err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "DeleteQuestion",
 			"input",question_id,
 			"output", nil,
@@ -113,7 +114,7 @@ func (mw LoggingMiddleware) DeleteQuestion(question_id string) (err error){
 
 func (mw LoggingMiddleware) UpdateAnswer(question_id, statement, user_id string) (output *models.Answer, err error){
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		  level.Debug(mw.Logger).Log(
 			"method", "UpdateAnswer",
 			"input",fmt.Sprintln(question_id, statement, user_id),
 			"output", fmt.Sprintln(output),
@@ -129,7 +130,7 @@ func (mw LoggingMiddleware) UpdateAnswer(question_id, statement, user_id string)
 
 func (mw LoggingMiddleware) GetUsers() (output []models.User, err error) {
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "GetUsers",
 			"input",nil,
 			"output", fmt.Sprintln(output),
@@ -145,7 +146,7 @@ func (mw LoggingMiddleware) GetUsers() (output []models.User, err error) {
 
 func (mw LoggingMiddleware) Validate(req interface{}) (err error) {
 	defer func(begin time.Time) {
-		mw.Logger.Log(
+		level.Debug(mw.Logger).Log(
 			"method", "GetQuestion",
 			"input",req,
 			"output", nil,
